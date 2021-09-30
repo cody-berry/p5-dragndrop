@@ -28,13 +28,13 @@ function setup() {
     createCanvas(640, 360)
     colorMode(HSB, 360, 100, 100, 100)
     for (let i = 0; i < 100; i++) {
-        vertices.push(new Vertex(random(width), random(height), 15))
+        vertices.push(new Vertex(random(width), random(height), random(30, 70)))
     }
 }
 
 function draw() {
     background(209, 80, 30)
-    vertices.forEach(v => v.show())
+    vertices.forEach(v => v.show(mouseX, mouseY))
 }
 
 
@@ -44,13 +44,13 @@ function draw() {
 //  reduce the number of checks, but since this is O(n) time, it's likely
 //  unnecessary.
 function mousePressed() {
-
+    vertices.forEach(v => v.pressed(mouseX, mouseY))
 }
 
 
 // call all our Vertices and make sure they know nothing's clicking them
 function mouseReleased() {
-
+    vertices.forEach(v => v.notPressed())
 }
 
 
@@ -95,24 +95,36 @@ class Vertex {
     // mouse dragging; this method will be called as show(mouseX, mouseY)
     show(x, y) {
         noFill()
-        circle(this.x, this.y, this.r)
+        if (this.dragging) {
+            this.x = x
+            this.y = y
+        }
+        circle(this.x, this.y, this.r*2)
     }
 
     // this is called on every Vertex on the canvas. we want to check if the
     // mouse is within our vertex, and if so, update our offsets. the offset
     // is the vector from the origin to the point where the mouse clicked.
     pressed(x, y) {
-
+        // We're only dragged if the pressing thing is on.
+        if (this.contains(x, y)) {
+            this.dragging = true
+            console.log("I've been pressed!")
+        }
     }
+
 
     // this should be called for every Vertex on the canvas whenever the
     // mouseReleased() event fires. we set our dragging flag to false :)
-    notPressed(x, y) {
-
+    notPressed() {
+        this.dragging = false
     }
 
     // a simple "does our Vertex area contain the point where the mouse
     // clicked" boolean function
     contains(x, y) {
+        // This is a circle, so we just have to make sure the distance between
+        // the point and us is less than our radius!
+        return dist(x, y, this.x, this.y) < this.r
     }
 }
