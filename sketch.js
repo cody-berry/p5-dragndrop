@@ -7,10 +7,10 @@ Exploring drag and drop with code from
 
 version comments
 .   vertex constructor
-    create 100 vertices and draw them with .show()
-    mousePressed, mouseReleased, contains
-    create offset vector whenever mouse clicks the vertex in pressed()
-    retrieve x in show() to update our vertex's position while dragging
+.   create 100 vertices and draw them with .show()
+.   mousePressed, mouseReleased, contains
+    create offset vector whenever mouse clicks the vertex in pressed()-----
+    ---->and retrieve x in show() to update our vertex's position while dragging
     mouseMoved, hovering flag
 
 
@@ -28,14 +28,16 @@ function setup() {
     createCanvas(640, 360)
     colorMode(HSB, 360, 100, 100, 100)
     for (let i = 0; i < 100; i++) {
-        vertices.push(new Vertex(random(width), random(height), random(30, 70)))
+        vertices.push(new Vertex(random(width), random(height), random(10, 20)))
     }
 }
 
 function draw() {
     background(209, 80, 30)
     vertices.forEach(v => v.show(mouseX, mouseY))
+    vertices.forEach(v => v.hovering = !!v.contains(mouseX, mouseY))
 }
+
 
 
 // if we press our mouse, check all Vertices on the canvas with our current
@@ -64,7 +66,6 @@ function mouseMoved() {
 
       in show(), fill transparent if hover is true
      */
-
 }
 
 /*
@@ -95,9 +96,13 @@ class Vertex {
     // mouse dragging; this method will be called as show(mouseX, mouseY)
     show(x, y) {
         noFill()
+        stroke(0, 0, 100)
         if (this.dragging) {
-            this.x = x
-            this.y = y
+            this.x = x + this.offsetX
+            this.y = y + this.offsetY
+        }
+        if (this.hovering) {
+            fill(0, 0, 100, 20)
         }
         circle(this.x, this.y, this.r*2)
     }
@@ -110,6 +115,8 @@ class Vertex {
         if (this.contains(x, y)) {
             this.dragging = true
             console.log("I've been pressed!")
+            this.offsetX = this.x - x
+            this.offsetY = this.y - y
         }
     }
 
